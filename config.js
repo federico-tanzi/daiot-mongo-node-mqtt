@@ -2,8 +2,7 @@ require("dotenv").config();
 module.exports = {
     services: {
         API: {
-            HOST: process.env.API_HOST || "",
-            PORT: process.env.API_PORT || ""
+            PORT: process.env.PORT || 3000
         },
         MQTT: {
             USERNAME: process.env.MQTT_USERNAME || "",

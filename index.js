@@ -43,5 +43,5 @@ router.use((err, req, res, next) => {
 });
 
 app.listen(API_ENV.PORT, function (req, res) {
-  console.log(`API Funcionando... en: http://${API_ENV.HOST}:${API_ENV.PORT}`);
+  console.log(`API Funcionando`);
 });
