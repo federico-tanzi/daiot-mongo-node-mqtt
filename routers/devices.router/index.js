@@ -2,33 +2,30 @@ const devicesCollection = require("./models/devices");
 const logsCollection = require("./models/logs");
 const clientMqtt = require("../../broker/mqtt");
 const options = clientMqtt.MQTTOptions;
-let topics = ["/topic/qos0"];
+let topics = ["/esp32/dht/data"];
 
 clientMqtt.on("connect", async function () {
 
-    const allTopics = await devicesCollection.distinct("topic");
-    topics.push(...allTopics);
+    const devices = await devicesCollection.find();
+
+    for (const device of devices) {
+        topics.push(device["topic"])
+        const message = {
+            active: device["active"].toString()
+        };
+        const payload = JSON.stringify(message);
+        clientMqtt.publish("/esp32/status/" + device["deviceId"], payload, options, (error) => {
+            if (error) {
+                console.log(error);
+            }
+        })
+    }
 
     clientMqtt.subscribe(topics, options, () => {
         console.log("Subscribed to topics: ");
         console.log(topics);
     });
 
-    for (const element in topics) {
-        const message = {
-            device_id: element,
-            ts: new Date().getTime(),
-            temp: Math.floor(1 + Math.random()*(35)).toString(),
-            hum: Math.floor(60 + Math.random()*(41)).toString()
-        };
-        const payload = JSON.stringify(message);
-        // Publico mensajes al inicio del servicio para verificar la subscripción
-        clientMqtt.publish(topics[element], payload, options, (error) => {
-            if (error) {
-                console.log(error);
-            }
-        })
-    }
     clientMqtt.on("message", async (topic, payload) => {
         console.log("[MQTT] Mensaje recibido: " + topic + ": " + payload.toString());
         let message = payload.toString();
