@@ -16,12 +16,10 @@ clientMqtt.on("connect", async function () {
 
     for (const element in topics) {
         const message = {
-            deviceId: parseInt(element),
-            name: "ESP32_TEMP_NODEjs",
-            location: "Terraza",
+            device_id: element,
             ts: new Date().getTime(),
-            temperature: Math.floor(1 + Math.random()*(35)),
-            humidity: Math.floor(60 + Math.random()*(41))
+            temp: Math.floor(1 + Math.random()*(35)).toString(),
+            hum: Math.floor(60 + Math.random()*(41)).toString()
         };
         const payload = JSON.stringify(message);
         // Publico mensajes al inicio del servicio para verificar la subscripción
@@ -42,28 +40,28 @@ clientMqtt.on("connect", async function () {
             return; // Salir de la función en caso de error de formato
         }
         // Verificar la existencia de todos los campos
-        const camposEsperados = ['temperature', 'humidity', 'name', 'location'];
+        const camposEsperados = ['temp', 'hum', 'device_id'];
         const camposFaltantes = camposEsperados.filter((campo) => !(campo in jason));
         if (camposFaltantes.length > 0) {
             console.log('CAMPOS FALTANTES: ', camposFaltantes.join(', '));
             return;
         }
         // Validar el formato del JSON
-        if (typeof jason.temperature !== 'number' || typeof jason.humidity !== 'number' || typeof jason.name !== 'string' || typeof jason.location !== 'string') {
+        if (typeof jason.temp !== 'string' || typeof jason.hum !== 'string' || typeof jason.device_id !== 'string') {
             console.log('FORMATO INCORRECTO');
             return;
         }
 
         const findDevice = await devicesCollection.findOne({
-            deviceId: jason.deviceId,
+            deviceId: jason.device_id,
         });
 
         if (findDevice) {
             const elLog = new logsCollection({
                 ts: new Date().getTime(),
-                temperature: jason.temperature,
-                humidity: jason.humidity,
-                deviceId: jason.deviceId
+                temperature: parseFloat(jason.temp),
+                humidity: parseFloat(jason.hum),
+                deviceId: jason.device_id
             });
             try {
                 await elLog.save();
@@ -72,10 +70,10 @@ clientMqtt.on("connect", async function () {
                 console.log("ERROR UPDATING");
             }
             await devicesCollection.findOneAndUpdate(
-                { deviceId: jason.deviceId },
+                { deviceId: jason.device_id },
                 {
-                    temperature: jason.temperature,
-                    humidity: jason.humidity
+                    temperature: parseFloat(jason.temp),
+                    humidity: parseFloat(jason.hum)
                 }).then(() => {
                     console.log("DISPOSITIVO ACTUALIZADO.");
                 }).catch(err => {
@@ -88,21 +86,21 @@ clientMqtt.on("connect", async function () {
             console.log(jason);
             // agrego un nuevo nodo en mongo
             const newDevice = new devicesCollection({
-                deviceId: jason.deviceId,
-                name: jason.name,
-                location: jason.location,
+                deviceId: jason.device_id,
+                name: 'DEFAULT',
+                location: 'DEFAULT',
                 active: true,
-                temperature: jason.temperature,
-                humidity: jason.humidity,
+                temperature: parseFloat(jason.temp),
+                humidity: parseFloat(jason.hum),
                 topic: topic
             });
             try {
                 await newDevice.save();
                 const elLog = new logsCollection({
                     ts: new Date().getTime(),
-                    temperature: jason.temperature,
-                    humidity: jason.humidity,
-                    deviceId: jason.deviceId
+                    temperature: parseFloat(jason.temp),
+                    humidity: parseFloat(jason.hum),
+                    deviceId: jason.device_id
                 });
                 try {
                     await elLog.save();
