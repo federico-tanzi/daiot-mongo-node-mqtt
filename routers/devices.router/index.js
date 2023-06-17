@@ -157,7 +157,7 @@ const register = (router) => {
 
     router.put('/devices/active/:id', async function (req, res) {
         await devicesCollection.findOneAndUpdate(
-            { deviceId: req.params.id },
+            { _id: req.params.id },
             {
                 active: true
             }).then(savedDevice => {
@@ -170,7 +170,7 @@ const register = (router) => {
 
     router.put('/devices/inactive/:id', async function (req, res) {
         await devicesCollection.findOneAndUpdate(
-            { deviceId: req.params.id },
+            { _id: req.params.id },
             {
                 active: false
             }).then(savedDevice => {
