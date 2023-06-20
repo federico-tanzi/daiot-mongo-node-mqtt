@@ -1,9 +1,6 @@
 require("dotenv").config();
 module.exports = {
     services: {
-        API: {
-            PORT: process.env.PORT || 3000
-        },
         MQTT: {
             USERNAME: process.env.MQTT_USERNAME || "",
             PASSWORD: process.env.MQTT_PASSWORD || "",
@@ -17,13 +14,6 @@ module.exports = {
                 DBNAME: process.env.DB_MONGO_NAME || "",
                 HOST: process.env.DB_MONGO_HOST || "",
                 PORT: process.env.DB_MONGO_PORT || ""
-            },
-            MYSQL: {
-                USERNAME: process.env.DB_MYSQL_USERNAME || "",
-                PASSWORD: process.env.DB_MYSQL_PASSWORD || "",
-                DBNAME: process.env.DB_MYSQL_NAME || "",
-                HOST: process.env.DB_MYSQL_HOST || "",
-                PORT: process.env.DB_MYSQL_PORT || ""
             }
         }
     },

@@ -4,10 +4,9 @@ const app = express();
 const errorHandler = require("errorhandler");
 const helmet = require("helmet");
 const Router = require("express-promise-router");
-const config = require("./config");
+
 var cors = require("cors");
 
-const API_ENV = config.services.API;
 const registerRoutes = require("./routers");
 const router = Router();
 
@@ -42,6 +41,6 @@ router.use((err, req, res, next) => {
   res.status(500).send(err.message);
 });
 
-app.listen(API_ENV.PORT, function (req, res) {
+app.listen(parseInt(process.env.PORT) || 8080, function (req, res) {
   console.log(`API Funcionando`);
 });
