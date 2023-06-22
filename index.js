@@ -14,13 +14,13 @@ const router = Router();
 require('./storage/database/mongo');
 
 // CORS:
-var corsOptions = {
-  origin: ["*"],
+const corsOptions = {
+  origin: "*",
   optionsSuccessStatus: 200,
-  methods: ["GET", "POST", "OPTIONS"],
+  methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH'],
 };
-app.use(cors());
-//app.use(cors(corsOptions));
+//app.use(cors());
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
